@@ -1,4 +1,4 @@
-package com.kakaopay.housingfund;
+package com.kakaopay.housingfund.fund.model;
 
 import com.kakaopay.housingfund.fund.model.BankAttribute;
 import com.kakaopay.housingfund.fund.model.HousingFund;
@@ -24,11 +24,8 @@ class InstituteTest {
         // given
         institute = createInstitute("일반은행", "BNK-0001", new ArrayList<>());
 
-        List<HousingFund> housingFunds = new ArrayList<>();
-        housingFunds.add(createHousingFund("2020", "01",institute, 1000));
-        housingFunds.add(createHousingFund("2020", "02",institute, 990));
-
-        institute = createInstitute("일반은행", "BNK-0001", housingFunds);
+        institute.addHousingFund(createHousingFund("2020", "01",institute, 1000));
+        institute.addHousingFund(createHousingFund("2020", "02",institute, 990));
     }
 
     @Test
@@ -42,7 +39,7 @@ class InstituteTest {
     }
 
     @Test
-    @DisplayName("주택 금융 - 기관별 지원 금액 중 가장 작ㅇ 값을 리턴")
+    @DisplayName("주택 금융 - 기관별 지원 금액 중 가장 작 값을 리턴")
     void minAmount_test() {
         // when
         final HousingFund housingFund = institute.minAmount();

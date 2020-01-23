@@ -1,5 +1,6 @@
 package com.kakaopay.housingfund.fund.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kakaopay.housingfund.common.Buildable;
 
 import javax.persistence.*;
@@ -9,7 +10,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Entity
 public class HousingFund implements Comparable<HousingFund> {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "housing_fund_id")
     private Long id;
 
@@ -19,6 +20,7 @@ public class HousingFund implements Comparable<HousingFund> {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "institute_id")
+    @JsonIgnore
     private Institute institute;
 
     private int amount;
@@ -30,14 +32,15 @@ public class HousingFund implements Comparable<HousingFund> {
     @Enumerated(EnumType.STRING)
     private Unit unit;
 
-    public HousingFund() {}
+    protected HousingFund() {}
 
-    private HousingFund(String year, String month, Institute institute, int amount, Unit unit) {
+    protected HousingFund(Long id, String year, String month, Institute institute, int amount, Unit unit) {
         checkNotNull(year, "Year must be provided");
         checkNotNull(month, "Month must be provided");
         checkNotNull(institute, "Institute must be provided");
         checkNotNull(amount, "Amount must be provided");
         checkNotNull(unit, "Unit must be provided");
+        this.id = id;
         this.year = year;
         this.month = month;
         this.institute = institute;
@@ -53,11 +56,17 @@ public class HousingFund implements Comparable<HousingFund> {
     }
 
     public static class Builder implements Buildable<HousingFund> {
+        private Long id;
         private String year;
         private String month;
         private Institute institute;
         private int amount;
         private Unit unit;
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
 
         public Builder year(String year) {
             this.year = year;
@@ -85,7 +94,7 @@ public class HousingFund implements Comparable<HousingFund> {
         }
         @Override
         public HousingFund build() {
-            return new HousingFund(year, month, institute, amount, unit);
+            return new HousingFund(id, year, month, institute, amount, unit);
         }
     }
 
@@ -112,4 +121,6 @@ public class HousingFund implements Comparable<HousingFund> {
     public Unit getUnit() {
         return unit;
     }
+
+
 }
