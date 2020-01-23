@@ -26,14 +26,21 @@ public class FundService {
 
     @Transactional
     public Institute save(Institute institute) {
-        validateInstitute(institute);
+        if(validateInstitute(institute)) {
+            throw new DuplicateInstituteException("Institute already exists");
+        };
         return instituteRepository.save(institute);
     }
 
     @Transactional
-    public void saveAll(List<Institute> institutes) {
+    public int saveAll(List<Institute> institutes) {
         institutes.stream().forEach(this::validateInstitute);
-        instituteRepository.saveAll(institutes);
+        final List<Institute> savedInstitutes = instituteRepository.saveAll(institutes);
+        return savedInstitutes.size();
+    }
+
+    @Transactional
+    public void updateInstitute(Institute institute) {
     }
 
     @Transactional
@@ -54,11 +61,9 @@ public class FundService {
         return instituteRepository.findByInstituteName(instituteName);
     }
 
-    private void validateInstitute(Institute institute) {
+    private boolean validateInstitute(Institute institute) {
         final Optional<Institute> byInstituteCode = instituteRepository.findByInstituteCode(institute.getInstituteCode());
-        if(byInstituteCode.isPresent()) {
-            throw new DuplicateInstituteException("Institute already exists");
-        }
+        return byInstituteCode.isPresent();
     }
 
 

@@ -67,7 +67,7 @@ public class InitDb {
                         BankAttribute attribute = i.contains("기금") ? BankAttribute.FUND : BankAttribute.BANK;
                         final Institute institute = new Institute.Builder()
                                 .instituteName(i)
-                                .instituteCode("bnk" + String.format("%4d", RandomUtils.nextInt(1, 9999)))
+                                .instituteCode("bnk" + String.format("%04d", RandomUtils.nextInt(1, 9999)))
                                 .housingFunds(new ArrayList<>())
                                 .attribute(attribute)
                                 .build();

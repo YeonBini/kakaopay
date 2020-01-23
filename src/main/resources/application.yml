@@ -4,6 +4,11 @@ spring:
   messages:
     basename: i18n/messages
     encoding: UTF-8
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
   jpa:
     hibernate:
       ddl-auto: create

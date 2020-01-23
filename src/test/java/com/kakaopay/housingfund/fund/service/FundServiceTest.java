@@ -82,11 +82,10 @@ class FundServiceTest {
     @Order(2)
     void saveAll() throws JsonProcessingException {
         // when
-        fundService.saveAll(institutes);
+        final int count = fundService.saveAll(institutes);
 
         // then
-        final List<Institute> all = fundService.findAll();
-        assertEquals(2, all.size());
+        assertEquals(institutes.size(), count);
     }
 
     @Test
@@ -123,6 +122,13 @@ class FundServiceTest {
         final Institute institute = fundService.findByInstituteName("일반은행").get();
         assertEquals(institute.getInstituteName(), "일반은행");
         assertEquals(institute.getInstituteCode(), "BNK-0001");
+    }
+
+    @Test
+    @DisplayName("기관 정보 업데이트 테스트")
+    @Order(6)
+    void updateInstitute() {
+
     }
 
     private HousingFund createHousingFund(String year, String month, Institute institute, int amount) {

@@ -5,6 +5,8 @@ import com.kakaopay.housingfund.common.Buildable;
 
 import javax.persistence.*;
 
+import java.util.Objects;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Entity
@@ -122,5 +124,21 @@ public class HousingFund implements Comparable<HousingFund> {
         return unit;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof HousingFund)) return false;
+        HousingFund that = (HousingFund) o;
+        return amount == that.amount &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(year, that.year) &&
+                Objects.equals(month, that.month) &&
+                Objects.equals(institute, that.institute) &&
+                unit == that.unit;
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, year, month, institute, amount, unit);
+    }
 }
