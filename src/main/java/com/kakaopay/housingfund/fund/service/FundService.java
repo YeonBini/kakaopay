@@ -1,5 +1,6 @@
 package com.kakaopay.housingfund.fund.service;
 
+import com.kakaopay.housingfund.exception.DuplicateInstituteException;
 import com.kakaopay.housingfund.fund.model.HousingFund;
 import com.kakaopay.housingfund.fund.model.Institute;
 import com.kakaopay.housingfund.fund.repository.HouseFundingRepository;
@@ -54,7 +55,10 @@ public class FundService {
     }
 
     private void validateInstitute(Institute institute) {
-
+        final Optional<Institute> byInstituteCode = instituteRepository.findByInstituteCode(institute.getInstituteCode());
+        if(byInstituteCode.isPresent()) {
+            throw new DuplicateInstituteException("Institute already exists");
+        }
     }
 
 

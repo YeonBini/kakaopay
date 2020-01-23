@@ -9,10 +9,10 @@ import java.util.Optional;
 
 public interface InstituteRepository extends JpaRepository<Institute, Long> {
 
-    @Query("select i from Institute i join fetch i.housingFunds h where i.instituteCode = :instituteCode")
+    @Query("select i from Institute i left join fetch i.housingFunds h where i.instituteCode = :instituteCode")
     Optional<Institute> findByInstituteCode(@Param("instituteCode") String instituteCode);
 
-    @Query("select i from Institute i join fetch i.housingFunds h where i.instituteName = :instituteName")
+    @Query("select i from Institute i left join fetch i.housingFunds h where i.instituteName = :instituteName")
     Optional<Institute> findByInstituteName(@Param("instituteName") String instituteName);
 
 }

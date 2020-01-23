@@ -1,6 +1,7 @@
 package com.kakaopay.housingfund.fund.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.kakaopay.housingfund.exception.DuplicateInstituteException;
 import com.kakaopay.housingfund.fund.model.BankAttribute;
 import com.kakaopay.housingfund.fund.model.HousingFund;
 import com.kakaopay.housingfund.fund.model.Institute;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
@@ -56,9 +58,28 @@ class FundServiceTest {
     }
 
     @Test
+    @DisplayName("금융 기관 중복 예외")
+    @Order(1)
+    void save_exception() {
+        // given
+        final Institute institute1 = createInstitute("test", "test-001", new ArrayList<>());
+        final Institute institute2 = createInstitute("test", "test-001", new ArrayList<>());
+
+        // when
+        fundService.save(institute1);
+
+        // then
+        assertThrows(
+                DuplicateInstituteException.class,
+                () -> {
+                    fundService.save(institute2);
+                });
+    }
+
+    @Test
     @DisplayName("금융 기관 리스트 저장 테스트")
     @Rollback(false)
-    @Order(1)
+    @Order(2)
     void saveAll() throws JsonProcessingException {
         // when
         fundService.saveAll(institutes);
@@ -70,7 +91,7 @@ class FundServiceTest {
 
     @Test
     @DisplayName("주택 펀드 추가 테스트")
-    @Order(2)
+    @Order(3)
     void addHousingFund() {
         // given
         final Institute institute = fundService.findByInstituteCode("BNK-0001").get();
@@ -86,7 +107,7 @@ class FundServiceTest {
 
     @Test
     @DisplayName("기관 코드 조회 테스트")
-    @Order(3)
+    @Order(4)
     void findByInstituteCode() {
         // then
         final Institute institute = fundService.findByInstituteCode("BNK-0001").get();
@@ -96,7 +117,7 @@ class FundServiceTest {
 
     @Test
     @DisplayName("기관 이름 조회 테스트")
-    @Order(4)
+    @Order(5)
     void findByInstituteName() {
         // then
         final Institute institute = fundService.findByInstituteName("일반은행").get();
