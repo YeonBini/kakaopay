@@ -1,6 +1,5 @@
 package com.kakaopay.housingfund.fund.controller;
 
-import com.kakaopay.housingfund.exception.InstituteNotFoundException;
 import com.kakaopay.housingfund.fund.model.HousingFund;
 import com.kakaopay.housingfund.fund.model.Institute;
 import com.kakaopay.housingfund.fund.model.api.request.InstituteSaveRequest;
@@ -74,7 +73,10 @@ public class FundApiController {
     @PostMapping("housing-fund/save")
     public ApiResult saveInstituteInfo(@RequestBody List<InstituteSaveRequest> saveRequest) {
         saveRequest.stream().forEach(
-                request -> fundService.updateHousingFund(request.getBank(), request.getYear(), request.getMonth(), request.getAmount())
+                request -> {
+                    logger.info("[saveInstituteInfo] " +request.toString());
+                    fundService.updateHousingFund(request.getBank(), request.getYear(), request.getMonth(), request.getAmount());
+                }
         );
 
         return OK("HousingFunds are registered");

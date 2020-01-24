@@ -1,5 +1,7 @@
 package com.kakaopay.housingfund.fund.model.api.request;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 public class InstituteSaveRequest {
     private String bank;
 
@@ -30,5 +32,15 @@ public class InstituteSaveRequest {
 
     public int getAmount() {
         return amount;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("bank", bank)
+                .append("year", year)
+                .append("month", month)
+                .append("amount", amount)
+                .toString();
     }
 }
