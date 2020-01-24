@@ -6,12 +6,11 @@ import com.kakaopay.housingfund.fund.model.Institute;
 import com.kakaopay.housingfund.fund.repository.HouseFundingRepository;
 import com.kakaopay.housingfund.fund.repository.InstituteRepository;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.Proxy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -67,6 +66,36 @@ public class FundService {
 
     public Optional<Institute> findByInstituteName(String instituteName) {
         return instituteRepository.findByInstituteName(instituteName);
+    }
+
+    public List<Map<String, Integer>> findByInstituteMinMaxAvg(String instituteName) {
+        final Optional<Institute> byInstituteName = instituteRepository.findByInstituteName(instituteName);
+        Hibernate.initialize(byInstituteName.get().getHousingFunds());
+
+        // 연도 기준을 avg값을 가져온다.
+        final Map<String, Double> avgAmountMap = byInstituteName.get().avgAmountByYear();
+        List<String> avgKeySetList = new ArrayList<>(avgAmountMap.keySet());
+        Collections.sort(avgKeySetList, Comparator.comparing(avgAmountMap::get));
+        int size = avgAmountMap.size();
+
+        List<Map<String, Integer>> avgMapList = getMinMaxList(avgAmountMap, avgKeySetList, size);
+
+        return avgMapList;
+
+    }
+
+    private List<Map<String, Integer>> getMinMaxList(Map<String, Double> avgAmountMap, List<String> avgKeySetList, int size) {
+        List<Map<String, Integer>> avgMapList = new ArrayList<>();
+        Map<String, Integer> minMap = new HashMap<>();
+        Map<String, Integer> maxMap = new HashMap<>();
+        minMap.put("year", Integer.parseInt(avgKeySetList.get(0)));
+        minMap.put("amount", (int)Math.round(avgAmountMap.get(avgKeySetList.get(0))));
+        maxMap.put("year", Integer.parseInt(avgKeySetList.get(size -1)));
+        maxMap.put("amount", (int)Math.round(avgAmountMap.get(avgKeySetList.get(size -1))));
+
+        avgMapList.add(minMap);
+        avgMapList.add(maxMap);
+        return avgMapList;
     }
 
     private boolean validateInstitute(Institute institute) {

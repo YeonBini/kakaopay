@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -46,6 +47,16 @@ class InstituteTest {
 
         // then
         assertEquals(housingFund.getAmount(), 990);
+    }
+
+    @Test
+    void avgAmountByYear_test() {
+        // when
+        final Map<String, Double> avgAmountByYear = institute.avgAmountByYear();
+
+        // then
+        final int actual = (int)Math.round(avgAmountByYear.get("2020"));
+        assertEquals(995, actual);
     }
 
 

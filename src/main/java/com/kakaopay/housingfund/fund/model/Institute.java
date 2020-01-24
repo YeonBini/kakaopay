@@ -5,11 +5,12 @@ import com.kakaopay.housingfund.common.Buildable;
 import javax.persistence.*;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.stream.Collectors.*;
 import static javax.persistence.CascadeType.ALL;
-import static javax.persistence.FetchType.LAZY;
 
 @Entity
 public class Institute {
@@ -48,6 +49,11 @@ public class Institute {
 
     public void addHousingFund(HousingFund housingFund) {
         this.housingFunds.add(housingFund);
+    }
+
+    public Map<String, Double> avgAmountByYear() {
+        return this.housingFunds.stream()
+                .collect(groupingBy(HousingFund::getYear, averagingInt(HousingFund::getAmount)));
     }
 
     public HousingFund maxAmount() {
