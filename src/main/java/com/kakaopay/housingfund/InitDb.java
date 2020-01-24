@@ -78,7 +78,7 @@ public class InitDb {
         public void initHousingFund() throws IOException {
             String housingFunds;
             while (StringUtils.isNotEmpty((housingFunds = br.readLine()))) {
-                final String[] housingFundArr = housingFunds.split(",");
+                final String[] housingFundArr = housingFunds.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
                 String year = housingFundArr[0];
                 String month = housingFundArr[1];
 

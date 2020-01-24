@@ -5,16 +5,21 @@ import com.kakaopay.housingfund.fund.model.Institute;
 import com.kakaopay.housingfund.fund.model.api.response.ApiResult;
 import com.kakaopay.housingfund.fund.model.api.response.institute.InstituteFundResponse;
 import com.kakaopay.housingfund.fund.model.api.response.institute.InstituteResponse;
+import com.kakaopay.housingfund.fund.model.api.response.institute.MaxHousingFundInstituteResonse;
 import com.kakaopay.housingfund.fund.service.FundService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.kakaopay.housingfund.fund.model.api.response.ApiResult.OK;
 import static java.util.stream.Collectors.*;
 
 @RestController
+@RequestMapping("institute")
 public class FundApiController {
 
     private final FundService fundService;
@@ -24,7 +29,7 @@ public class FundApiController {
     }
 
     // 주택금융 공급 금융기관(은행) 목록을 출력하는 API 를 개발하세요
-    @GetMapping("/institute/list")
+    @GetMapping("list")
     public ApiResult findInstituteList() {
         final List<Institute> allInstitute = fundService.findAll();
         final List<InstituteResponse> allInstituteResponse = allInstitute.stream()
@@ -34,7 +39,7 @@ public class FundApiController {
     }
 
     // 년도별 각 금융기관의 지원금액 합계를 출력하는 API 를 개발하세요.
-    @GetMapping("/institute/fund/list")
+    @GetMapping("housing-fund/list")
     public ApiResult findInstituteByYear() {
         final List<Institute> allInstitute = fundService.findAllFetchJoin();
         final List<Detail> institutesGroupByYear = instituteGroupByYear(allInstitute);
@@ -43,6 +48,21 @@ public class FundApiController {
         List<InstituteFundResponse> instituteFundResponseList = getInstituteFundResponses(detailGroupByYear);
 
         return OK(instituteFundResponseList);
+    }
+
+    // 각 년도별 각 기관의 전체 지원 금액 중에서 가장 큰 금액의 기관명을 출력하는 API 개발
+    @GetMapping("housing-fund/{year}/max")
+    public ApiResult findHousingFundMax(@PathVariable("year") String year) {
+        final List<Institute> allInstitute = fundService.findAllFetchJoin();
+        final List<Detail> institutesGroupByYear = instituteGroupByYear(allInstitute);
+        final List<Detail> detailsByYear = detailGroupByYear(institutesGroupByYear).get(year);
+
+        checkNotNull(detailsByYear, "Year does not match");
+        final Detail maxInstitute = detailsByYear.stream().max(Comparator.comparingInt(Detail::getAmount)).get();
+
+        final MaxHousingFundInstituteResonse max = new MaxHousingFundInstituteResonse(Integer.parseInt(maxInstitute.getYear()), maxInstitute.getInstituteName());
+
+        return OK(max);
     }
 
     private List<InstituteFundResponse> getInstituteFundResponses(Map<String, List<Detail>> detailGroupByYear) {
