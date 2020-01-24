@@ -52,6 +52,11 @@ public class HousingFund implements Comparable<HousingFund> {
         this.unit = unit;
     }
 
+    public void updateHousingFund(int amount) {
+        this.amount = amount;
+    }
+
+
     @Override
     public int compareTo(HousingFund housingFund) {
         final Long compare = (housingFund.getAmount() * housingFund.getUnit().getKrAmount())

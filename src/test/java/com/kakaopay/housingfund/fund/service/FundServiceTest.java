@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -126,9 +127,16 @@ class FundServiceTest {
     @Test
     @DisplayName("기관 정보 업데이트 테스트")
     void updateInstitute() {
+        // given
+        Institute institute1 = createInstitute("test", "test-001", new ArrayList<>());
 
+        // when
+        fundService.save(institute1);
+
+        // then
+        fundService.findByInstituteCode("test-001");
     }
-
+    
     private HousingFund createHousingFund(String year, String month, Institute institute, int amount) {
         HousingFund housingFund = new HousingFund.Builder()
                 .year(year)
