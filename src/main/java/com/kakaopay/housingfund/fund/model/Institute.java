@@ -28,7 +28,7 @@ public class Institute {
     @Enumerated(EnumType.STRING)
     private BankAttribute attribute;
 
-    @OneToMany(mappedBy = "institute", cascade = ALL, fetch = LAZY)
+    @OneToMany(mappedBy = "institute", cascade = ALL)
     private List<HousingFund> housingFunds;
 
     protected Institute() {}

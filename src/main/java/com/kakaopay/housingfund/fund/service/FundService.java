@@ -5,6 +5,8 @@ import com.kakaopay.housingfund.fund.model.HousingFund;
 import com.kakaopay.housingfund.fund.model.Institute;
 import com.kakaopay.housingfund.fund.repository.HouseFundingRepository;
 import com.kakaopay.housingfund.fund.repository.InstituteRepository;
+import org.hibernate.Hibernate;
+import org.hibernate.annotations.Proxy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,9 +28,10 @@ public class FundService {
 
     @Transactional
     public Institute save(Institute institute) {
-        if(validateInstitute(institute)) {
+        if (validateInstitute(institute)) {
             throw new DuplicateInstituteException("Institute already exists");
-        };
+        }
+        ;
         return instituteRepository.save(institute);
     }
 
@@ -52,6 +55,11 @@ public class FundService {
         return instituteRepository.findAll();
     }
 
+    public List<Institute> findAllFetchJoin() {
+        List<Institute> all = instituteRepository.findAll();
+        all.stream().forEach(a -> Hibernate.initialize(a.getHousingFunds()));
+        return all;
+    }
 
     public Optional<Institute> findByInstituteCode(String instituteCode) {
         return instituteRepository.findByInstituteCode(instituteCode);

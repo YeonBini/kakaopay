@@ -15,8 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -126,7 +125,6 @@ class FundServiceTest {
 
     @Test
     @DisplayName("기관 정보 업데이트 테스트")
-    @Order(6)
     void updateInstitute() {
 
     }

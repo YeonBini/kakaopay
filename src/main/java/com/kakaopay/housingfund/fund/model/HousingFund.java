@@ -2,14 +2,16 @@ package com.kakaopay.housingfund.fund.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kakaopay.housingfund.common.Buildable;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
-
 import java.util.Objects;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static javax.persistence.FetchType.LAZY;
 
 @Entity
+@BatchSize(size = 100)
 public class HousingFund implements Comparable<HousingFund> {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,7 +22,7 @@ public class HousingFund implements Comparable<HousingFund> {
 
     private String month;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "institute_id")
     @JsonIgnore
     private Institute institute;
