@@ -2,6 +2,7 @@ package com.kakaopay.housingfund.fund.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kakaopay.housingfund.common.Buildable;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
@@ -147,5 +148,17 @@ public class HousingFund implements Comparable<HousingFund> {
     @Override
     public int hashCode() {
         return Objects.hash(id, year, month, institute, amount, unit);
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("year", year)
+                .append("month", month)
+                .append("institute", institute)
+                .append("amount", amount)
+                .append("unit", unit)
+                .toString();
     }
 }

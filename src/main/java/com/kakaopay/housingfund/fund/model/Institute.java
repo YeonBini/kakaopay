@@ -1,6 +1,7 @@
 package com.kakaopay.housingfund.fund.model;
 
 import com.kakaopay.housingfund.common.Buildable;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
 import java.util.Collections;
@@ -140,5 +141,14 @@ public class Institute {
         return Objects.hash(id, instituteName, instituteCode, attribute, housingFunds);
     }
 
-
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("instituteName", instituteName)
+                .append("instituteCode", instituteCode)
+                .append("attribute", attribute)
+                .append("housingFunds", housingFunds)
+                .toString();
+    }
 }
