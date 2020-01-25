@@ -35,3 +35,8 @@ logging:
     org:
       hibernate:
         type: trace
+jwt:
+  token:
+    header: api_key
+    issuer: housing_fund
+    clientSecret: secret
