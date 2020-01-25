@@ -13,6 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 @Service
 @Transactional(readOnly = true)
 public class FundService {
@@ -28,6 +31,7 @@ public class FundService {
 
     @Transactional
     public Institute save(Institute institute) {
+        checkNotNull(institute, "Institute must be provided");
         if (validateInstitute(institute)) {
             throw new DuplicateInstituteException("Institute already exists");
         }
@@ -37,13 +41,10 @@ public class FundService {
 
     @Transactional
     public int saveAll(List<Institute> institutes) {
+        checkNotNull(institutes, "Institute must be provided");
         institutes.stream().forEach(this::validateInstitute);
         final List<Institute> savedInstitutes = instituteRepository.saveAll(institutes);
         return savedInstitutes.size();
-    }
-
-    @Transactional
-    public void updateInstitute(Institute institute) {
     }
 
     @Transactional
@@ -71,6 +72,11 @@ public class FundService {
 
     @Transactional
     public void updateHousingFund(String instituteName, String year, String month, int amount) {
+        checkNotNull(instituteName, "Institute name must be provided");
+        checkNotNull(year, "Year must be provided");
+        checkNotNull(month, "Year must be provided");
+        checkArgument(amount >= 0, "amount must be positive");
+
         // 1. institute가 이미 있는지 확인
         final Optional<Institute> byInstituteName = instituteRepository.findByInstituteName(instituteName);
 

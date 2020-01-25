@@ -68,6 +68,8 @@ public class FundApiController {
         return OK(max);
     }
 
+    // 기관을 추가하는 컨트롤러?
+
     // 데이터 파일에서 각 레코드를 데이터베이스에 저장하는 API 개발
     // -> 입력 요청 리스트를 받아서 저장하는 로직 작성
     @PostMapping("housing-fund/save")
