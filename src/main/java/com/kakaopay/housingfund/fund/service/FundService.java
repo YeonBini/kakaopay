@@ -52,24 +52,6 @@ public class FundService {
         institute.addHousingFund(housingFund);
     }
 
-    public List<Institute> findAll() {
-        return instituteRepository.findAll();
-    }
-
-    public List<Institute> findAllFetchJoin() {
-        List<Institute> all = instituteRepository.findAll();
-        all.stream().forEach(a -> Hibernate.initialize(a.getHousingFunds()));
-        return all;
-    }
-
-    public Optional<Institute> findByInstituteCode(String instituteCode) {
-        return instituteRepository.findByInstituteCode(instituteCode);
-    }
-
-    public Optional<Institute> findByInstituteName(String instituteName) {
-        return instituteRepository.findByInstituteName(instituteName);
-    }
-
     @Transactional
     public void updateHousingFund(String instituteName, String year, String month, int amount) {
         checkNotNull(instituteName, "Institute name must be provided");
@@ -101,6 +83,24 @@ public class FundService {
                     .build();
             institute.addHousingFund(housingFund);
         }
+    }
+
+    public List<Institute> findAll() {
+        return instituteRepository.findAll();
+    }
+
+    public List<Institute> findAllFetchJoin() {
+        List<Institute> all = instituteRepository.findAll();
+        all.stream().forEach(a -> Hibernate.initialize(a.getHousingFunds()));
+        return all;
+    }
+
+    public Optional<Institute> findByInstituteCode(String instituteCode) {
+        return instituteRepository.findByInstituteCode(instituteCode);
+    }
+
+    public Optional<Institute> findByInstituteName(String instituteName) {
+        return instituteRepository.findByInstituteName(instituteName);
     }
 
     public List<Map<String, Integer>> findByInstituteMinMaxAvg(String instituteName) {
