@@ -3,10 +3,8 @@ package com.kakaopay.housingfund.user.service;
 import com.kakaopay.housingfund.exception.UserNotFoundException;
 import com.kakaopay.housingfund.user.model.Account;
 import com.kakaopay.housingfund.user.repository.UserRepository;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +32,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public Account loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("Email does not exists"));
     }
 }

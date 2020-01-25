@@ -159,7 +159,7 @@ public class Account implements UserDetails {
         return lastLogin;
     }
 
-    public List<Role> getRole() {
+    public List<Role> getRoles() {
         return roles;
     }
 

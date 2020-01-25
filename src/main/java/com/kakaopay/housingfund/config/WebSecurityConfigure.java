@@ -35,7 +35,8 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
                     .antMatchers("/institute/housing-fund/*/max").permitAll()
                     .antMatchers("/institute/housing-fund/save").hasRole("USER")
                     .antMatchers("/user/signin", "/user/signup").permitAll()
-                    .anyRequest().permitAll()
+                    .antMatchers("/h2-console/**").permitAll()
+                    .anyRequest().hasRole("USER")
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }

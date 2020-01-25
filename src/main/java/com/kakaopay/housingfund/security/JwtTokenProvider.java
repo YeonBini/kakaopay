@@ -18,10 +18,14 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
+import java.util.regex.Pattern;
 
 @Component
 public class JwtTokenProvider { // JWT 토큰을 생성 및 검증
     private final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
+
+    private static final Pattern BEARER = Pattern.compile("^Bearer$", Pattern.CASE_INSENSITIVE);
 
     @Value("${jwt.token.header}")
     private String tokenHeader;
@@ -43,10 +47,10 @@ public class JwtTokenProvider { // JWT 토큰을 생성 및 검증
     }
 
     // JWT 토큰 생성
-    public String createToken(String email, Role role) {
+    public String createToken(String email, List<Role> roles) {
         Claims claims = Jwts.claims();
         claims.setSubject(email);
-        claims.put("ROLE", role);
+        claims.put("ROLE", roles);
         Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims)
@@ -67,7 +71,15 @@ public class JwtTokenProvider { // JWT 토큰을 생성 및 검증
     }
 
     public String resolveTokenHeader(HttpServletRequest request) {
-        return request.getHeader(tokenHeader);
+        final String token = request.getHeader(tokenHeader);
+        if (token != null) {
+            if (logger.isDebugEnabled()) logger.debug("JWT TOKEN : " + token);
+            final String[] parts = token.split(" ");
+            final String scheme = parts[0];
+            final String credential = parts[1];
+            return BEARER.matcher(scheme).matches() ? credential : null;
+        }
+        return null;
     }
 
     public boolean validateToken(String jwtToken) {
