@@ -1,6 +1,5 @@
 package com.kakaopay.housingfund.user.controller;
 
-import com.kakaopay.housingfund.exception.EmailSignFailedException;
 import com.kakaopay.housingfund.fund.model.api.response.ApiResult;
 import com.kakaopay.housingfund.security.JwtTokenProvider;
 import com.kakaopay.housingfund.user.model.Account;
@@ -10,8 +9,6 @@ import com.kakaopay.housingfund.user.model.api.response.UserSignInResponse;
 import com.kakaopay.housingfund.user.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,12 +22,10 @@ import static com.kakaopay.housingfund.fund.model.api.response.ApiResult.OK;
 @RequestMapping("user")
 public class UserApiController {
 
-    private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
 
-    public UserApiController(PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider, UserService userService) {
-        this.passwordEncoder = passwordEncoder;
+    public UserApiController(JwtTokenProvider jwtTokenProvider, UserService userService) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
     }
@@ -39,7 +34,7 @@ public class UserApiController {
     public ApiResult join(@RequestBody UserJoinRequest userJoinRequest) {
         Account account = new Account.Builder()
                 .email(userJoinRequest.getEmail())
-                .password(passwordEncoder.encode(userJoinRequest.getPassword()))
+                .password(userJoinRequest.getPassword())
                 .createdAt(LocalDateTime.now())
                 .roles(userJoinRequest.getRoles())
                 .build();
@@ -50,10 +45,7 @@ public class UserApiController {
 
     @PostMapping("signin")
     public ApiResult login(@RequestBody UserLoginRequest userLoginRequest) {
-        Account account = userService.loadUserByUsername(userLoginRequest.getEmail());
-        if(!passwordEncoder.matches(userLoginRequest.getPassword(), account.getPassword())) {
-            throw new EmailSignFailedException("Email sign failed");
-        }
+        Account account = userService.login(userLoginRequest.getEmail(), userLoginRequest.getPassword());
         final String token = jwtTokenProvider.createToken(account.getEmail(), account.getRoles());
         UserSignInResponse userSignInResponse = new UserSignInResponse(account.getEmail(), token);
         return OK(userSignInResponse);

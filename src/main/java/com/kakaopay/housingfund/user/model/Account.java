@@ -46,7 +46,7 @@ public class Account implements UserDetails {
         checkArgument(email.length() >= 4 && email.length() < 100,
                 "address length must be between 4 and 50 characters.");
         checkArgument(checkAddress(email), "Invalid email address : " + email);
-        checkArgument(password.length() >=10 && password.length()<=100,
+        checkArgument(checkPassword(password),
                 "Password should be between 10 and 100 characters");
         this.email = email;
         this.password = password;
@@ -59,7 +59,12 @@ public class Account implements UserDetails {
         return matches("[\\w~\\-.+]+@[\\w~\\-]+(\\.[\\w~\\-]+)+", email);
     }
 
+    private boolean checkPassword(String password) {
+        return password.length() >=10 && password.length()<=100;
+    }
     public void updatePassword(String password) {
+        checkArgument(checkPassword(password),
+                "Password should be between 10 and 100 characters");
         this.password = password;
     }
 

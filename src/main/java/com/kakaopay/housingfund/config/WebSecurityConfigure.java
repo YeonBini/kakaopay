@@ -10,8 +10,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -46,6 +44,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
                     .antMatchers("/institute/housing-fund/list").permitAll()
                     .antMatchers("/institute/housing-fund/*/max").permitAll()
                     .antMatchers("/institute/housing-fund/save").hasRole("USER")
+                    .antMatchers("/institute/foreign-bank/min-max").permitAll()
                     .antMatchers("/user/signin", "/user/signup").permitAll()
                     .antMatchers("/h2-console/**").permitAll()
                     .anyRequest().hasRole("USER")
@@ -64,8 +63,5 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
         return new JwtAuthenticationFilter(jwtTokenProvider);
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+
 }
