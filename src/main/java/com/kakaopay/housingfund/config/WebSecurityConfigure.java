@@ -41,6 +41,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                     .antMatchers("/institute/list").permitAll()
+                    .antMatchers("/institute/predict").permitAll()
                     .antMatchers("/institute/housing-fund/list").permitAll()
                     .antMatchers("/institute/housing-fund/*/max").permitAll()
                     .antMatchers("/institute/housing-fund/save").hasRole("USER")

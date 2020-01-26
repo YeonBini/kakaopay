@@ -3,11 +3,14 @@ package com.kakaopay.housingfund.fund.controller;
 import com.kakaopay.housingfund.fund.model.HousingFund;
 import com.kakaopay.housingfund.fund.model.Institute;
 import com.kakaopay.housingfund.fund.model.api.request.InstituteSaveRequest;
+import com.kakaopay.housingfund.fund.model.api.request.PredictRequest;
 import com.kakaopay.housingfund.fund.model.api.response.ApiResult;
 import com.kakaopay.housingfund.fund.model.api.response.institute.InstituteFundResponse;
 import com.kakaopay.housingfund.fund.model.api.response.institute.InstituteResponse;
 import com.kakaopay.housingfund.fund.model.api.response.institute.MaxHousingFundInstituteResonse;
+import com.kakaopay.housingfund.fund.model.api.response.institute.PredictResponse;
 import com.kakaopay.housingfund.fund.service.FundService;
+import com.kakaopay.housingfund.util.predict.LinearRegressionModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -82,6 +85,43 @@ public class FundApiController {
         );
 
         return OK("HousingFunds are registered");
+    }
+
+    @GetMapping("predict")
+    public ApiResult predictFund(@RequestBody PredictRequest predictRequest) {
+        final Institute institute = fundService.findByInstituteNameFetchJoin(predictRequest.getBank()).get();
+        final List<Double> amountByMonth = getAmountByMonth(predictRequest, institute);
+
+        int result = getPredictionResult(amountByMonth);
+        final PredictResponse predictResponse = new PredictResponse(institute.getInstituteCode(), 2018, Integer.parseInt(predictRequest.getMonth()), result);
+
+        return OK(predictResponse);
+    }
+
+    private int getPredictionResult(List<Double> amountByMonth) {
+        int size = amountByMonth.size();
+        double[] time = new double[size];
+        double[] amount = new double[size];
+        for(int i=0; i<size; i++) {
+            time[i] = i+1;
+            amount[i] = amountByMonth.get(i);
+        }
+
+        LinearRegressionModel model = new LinearRegressionModel(time, amount);
+        model.compute();
+        double[] coefficients = model.getCoefficients();
+        logger.debug("[predictFund] slope : " +coefficients[1] + ", intercept : " +coefficients[0]);
+        return (int) (coefficients[0] + coefficients[1] * size);
+    }
+
+    private List<Double> getAmountByMonth(@RequestBody PredictRequest predictRequest, Institute institute) {
+        final List<Double> amountByMonth = new ArrayList<>();
+        institute.getHousingFunds().forEach(housingFund -> {
+            if(housingFund.getMonth().equals(predictRequest.getMonth())) {
+                amountByMonth.add((double) housingFund.getAmount());
+            }
+        });
+        return amountByMonth;
     }
 
     private List<InstituteFundResponse> getInstituteFundResponses(Map<String, List<Detail>> detailGroupByYear) {

@@ -104,6 +104,12 @@ public class FundService {
         return instituteRepository.findByInstituteName(instituteName);
     }
 
+    public Optional<Institute>  findByInstituteNameFetchJoin(String bankName) {
+        final Optional<Institute> byInstituteName = instituteRepository.findByInstituteName(bankName);
+        Hibernate.initialize(byInstituteName.get().getHousingFunds());
+        return byInstituteName;
+    }
+
     public List<Map<String, Integer>> findByInstituteMinMaxAvg(String instituteName) {
         final Optional<Institute> byInstituteName = instituteRepository.findByInstituteName(instituteName);
         Hibernate.initialize(byInstituteName.get().getHousingFunds());
@@ -144,6 +150,7 @@ public class FundService {
         final Optional<Institute> byInstituteCode = instituteRepository.findByInstituteCode(institute.getInstituteCode());
         return byInstituteCode.isPresent();
     }
+
 
 
 }
