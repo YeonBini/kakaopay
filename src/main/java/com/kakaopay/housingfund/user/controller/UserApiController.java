@@ -9,6 +9,7 @@ import com.kakaopay.housingfund.user.model.api.request.UserLoginRequest;
 import com.kakaopay.housingfund.user.model.api.response.UserSignInResponse;
 import com.kakaopay.housingfund.user.service.UserService;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -59,8 +60,7 @@ public class UserApiController {
     }
 
     @PostMapping("refreshToken")
-    public ApiResult refreshToken() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ApiResult refreshToken(@AuthenticationPrincipal Authentication authentication) {
         final String email = authentication.getName();
         final Account account = userService.loadUserByUsername(email);
         final String token = jwtTokenProvider.createToken(email, account.getRoles());

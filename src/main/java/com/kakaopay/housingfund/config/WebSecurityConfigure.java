@@ -1,5 +1,7 @@
 package com.kakaopay.housingfund.config;
 
+import com.kakaopay.housingfund.security.EntryPointUnauthorizedHandler;
+import com.kakaopay.housingfund.security.JwtAccessDeniedHandler;
 import com.kakaopay.housingfund.security.JwtAuthenticationFilter;
 import com.kakaopay.housingfund.security.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +19,14 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    public WebSecurityConfigure(JwtTokenProvider jwtTokenProvider) {
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+
+    private final EntryPointUnauthorizedHandler entryPointUnauthorizedHandler;
+
+    public WebSecurityConfigure(JwtTokenProvider jwtTokenProvider, JwtAccessDeniedHandler jwtAccessDeniedHandler, EntryPointUnauthorizedHandler entryPointUnauthorizedHandler) {
         this.jwtTokenProvider = jwtTokenProvider;
+        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
+        this.entryPointUnauthorizedHandler = entryPointUnauthorizedHandler;
     }
 
     @Override
@@ -28,6 +36,10 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
                 .formLogin().disable()
                 .headers().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .exceptionHandling()
+                    .accessDeniedHandler(jwtAccessDeniedHandler)
+                    .authenticationEntryPoint(entryPointUnauthorizedHandler)
                 .and()
                 .authorizeRequests()
                     .antMatchers("/institute/list").permitAll()
