@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -123,8 +124,14 @@ public class FundService {
         List<Map<String, Integer>> avgMapList = new ArrayList<>();
         Map<String, Integer> minMap = new HashMap<>();
         Map<String, Integer> maxMap = new HashMap<>();
-        minMap.put("year", Integer.parseInt(avgKeySetList.get(0)));
-        minMap.put("amount", (int) Math.round(avgAmountMap.get(avgKeySetList.get(0))));
+
+        for (int i = 0; i < size; i++) {
+            if (avgAmountMap.get(avgKeySetList.get(i)).intValue() != 0) {
+                minMap.put("year", Integer.parseInt(avgKeySetList.get(i)));
+                minMap.put("amount", (int) Math.round(avgAmountMap.get(avgKeySetList.get(i))));
+                break;
+            }
+        }
         maxMap.put("year", Integer.parseInt(avgKeySetList.get(size - 1)));
         maxMap.put("amount", (int) Math.round(avgAmountMap.get(avgKeySetList.get(size - 1))));
 
