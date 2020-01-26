@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -54,7 +55,7 @@ public class InitDb {
 
         {
             resource = new ClassPathResource("housing_fund.csv");
-            br = Files.newBufferedReader(Paths.get(resource.getURI()));
+            br = new BufferedReader(new InputStreamReader(resource.getInputStream()));
             Charset.forName("UTF-8");
         }
 
