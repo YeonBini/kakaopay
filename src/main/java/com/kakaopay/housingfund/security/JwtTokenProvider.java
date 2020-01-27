@@ -33,7 +33,7 @@ public class JwtTokenProvider { // JWT 토큰을 생성 및 검증
     @Value("${jwt.token.clientSecret}")
     private String secretKey;
 
-    private final Long tokenValidTime = 1000L * 60;
+    private final Long tokenValidTime = 1000L * 60 * 10;
 
     private final UserService userService;
 

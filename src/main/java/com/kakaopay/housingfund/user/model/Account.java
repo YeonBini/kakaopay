@@ -36,6 +36,7 @@ public class Account implements UserDetails {
     private LocalDateTime lastLogin;
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "acount_role", joinColumns = @JoinColumn(name = "account_id"))
     @Enumerated(EnumType.STRING)
     private List<Role> roles;
 

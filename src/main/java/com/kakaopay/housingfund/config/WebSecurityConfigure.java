@@ -40,6 +40,8 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
                     .authenticationEntryPoint(entryPointUnauthorizedHandler)
                 .and()
                 .authorizeRequests()
+                    .antMatchers("/").permitAll()
+                    .antMatchers("/csrf").permitAll()
                     .antMatchers("/institute/list").permitAll()
                     .antMatchers("/institute/predict").permitAll()
                     .antMatchers("/institute/housing-fund/list").permitAll()
@@ -47,6 +49,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
                     .antMatchers("/institute/housing-fund/save").hasRole("USER")
                     .antMatchers("/institute/foreign-bank/min-max").permitAll()
                     .antMatchers("/user/signin", "/user/signup").permitAll()
+                    .antMatchers("/user/refreshToken").hasRole("USER")
                     .antMatchers("/h2-console/**").permitAll()
                     .anyRequest().hasRole("USER")
                 .and()
@@ -56,7 +59,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/h2-console/**","/swagger-resources/**",
-                "/swagger-ui.html", "/webjars/**", "/swagger/**");
+                "/swagger-ui.html", "/webjars/**", "/swagger/**", "/v2/api-docs");
     }
 
     @Bean

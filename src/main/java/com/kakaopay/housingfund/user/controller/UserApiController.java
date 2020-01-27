@@ -7,6 +7,7 @@ import com.kakaopay.housingfund.user.model.api.request.UserJoinRequest;
 import com.kakaopay.housingfund.user.model.api.request.UserLoginRequest;
 import com.kakaopay.housingfund.user.model.api.response.UserSignInResponse;
 import com.kakaopay.housingfund.user.service.UserService;
+import io.swagger.annotations.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +21,7 @@ import static com.kakaopay.housingfund.fund.model.api.response.ApiResult.OK;
 
 @RestController
 @RequestMapping("user")
+@Api(tags = "사용자 Api")
 public class UserApiController {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -30,8 +32,9 @@ public class UserApiController {
         this.userService = userService;
     }
 
+    @ApiOperation(value = "회원가입")
     @PostMapping("signup")
-    public ApiResult join(@RequestBody UserJoinRequest userJoinRequest) {
+    public ApiResult join(@RequestBody @ApiParam(name = "회원 가입 양식", required = true) UserJoinRequest userJoinRequest) {
         Account account = new Account.Builder()
                 .email(userJoinRequest.getEmail())
                 .password(userJoinRequest.getPassword())
@@ -43,14 +46,20 @@ public class UserApiController {
         return OK(account.getEmail());
     }
 
+    @ApiOperation(value = "로그인")
     @PostMapping("signin")
-    public ApiResult login(@RequestBody UserLoginRequest userLoginRequest) {
+    public ApiResult login(@RequestBody @ApiParam(name = "로그인 입력 양식", required = true) UserLoginRequest userLoginRequest) {
         Account account = userService.login(userLoginRequest.getEmail(), userLoginRequest.getPassword());
         final String token = jwtTokenProvider.createToken(account.getEmail(), account.getRoles());
         UserSignInResponse userSignInResponse = new UserSignInResponse(account.getEmail(), token);
         return OK(userSignInResponse);
     }
 
+    @ApiOperation(value = "jwt 토큰 재발급")
+    @ApiImplicitParam(
+            name = "api_key", value = "JWT 토큰", required = true, dataType = "string",
+            paramType = "header", defaultValue = "Bearer "
+    )
     @PostMapping("refreshToken")
     public ApiResult refreshToken(@AuthenticationPrincipal Authentication authentication) {
         final String email = authentication.getName();

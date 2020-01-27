@@ -11,8 +11,14 @@ import com.kakaopay.housingfund.fund.model.api.response.institute.MaxHousingFund
 import com.kakaopay.housingfund.fund.model.api.response.institute.PredictResponse;
 import com.kakaopay.housingfund.fund.service.FundService;
 import com.kakaopay.housingfund.util.predict.LinearRegressionModel;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -23,6 +29,7 @@ import static java.util.stream.Collectors.*;
 
 @RestController
 @RequestMapping("institute")
+@Api(tags = "주택금융 Api")
 public class FundApiController {
 
     private Logger logger = LoggerFactory.getLogger(FundApiController.class);
@@ -34,6 +41,7 @@ public class FundApiController {
     }
 
     // 주택금융 공급 금융기관(은행) 목록을 출력하는 API 를 개발하세요
+    @ApiOperation(value = "주택금융기관 리스트")
     @GetMapping("list")
     public ApiResult findInstituteList() {
         final List<Institute> allInstitute = fundService.findAll();
@@ -44,6 +52,7 @@ public class FundApiController {
     }
 
     // 년도별 각 금융기관의 지원금액 합계를 출력하는 API 를 개발하세요.
+    @ApiOperation(value = "연도별 금융기관 지원금액 합계")
     @GetMapping("housing-fund/list")
     public ApiResult findInstituteByYear() {
         final List<Institute> allInstitute = fundService.findAllFetchJoin();
@@ -56,6 +65,8 @@ public class FundApiController {
     }
 
     // 각 년도별 각 기관의 전체 지원 금액 중에서 가장 큰 금액의 기관명을 출력하는 API 개발
+    @ApiOperation("해당 연도 최대 금액을 지원한 금융기관")
+    @ApiImplicitParam(name = "year", value = "연도", required = true, paramType = "path", defaultValue = "2005")
     @GetMapping("housing-fund/{year}/max")
     public ApiResult findHousingFundMax(@PathVariable("year") String year) {
         logger.info("[findHousingFundMax] year = " + year);
@@ -73,8 +84,15 @@ public class FundApiController {
 
     // 데이터 파일에서 각 레코드를 데이터베이스에 저장하는 API 개발
     // -> 입력 요청 리스트를 받아서 저장하는 로직 작성
+    @ApiOperation(value = "주택금융 추가")
+    @ApiImplicitParam(
+            name = "api_key", value = "JWT 토큰", required = true, dataType = "string",
+            paramType = "header", defaultValue = "Bearer "
+    )
     @PostMapping("housing-fund/save")
-    public ApiResult saveInstituteInfo(@RequestBody List<InstituteSaveRequest> saveRequest) {
+    public ApiResult saveInstituteInfo(
+            @AuthenticationPrincipal Authentication authentication,
+            @RequestBody @ApiParam(name = "주택금융 추가 리스트", required = true) List<InstituteSaveRequest> saveRequest) {
         saveRequest.stream().forEach(
                 request -> {
                     logger.info("[saveInstituteInfo] " +request.toString());
