@@ -3,7 +3,6 @@ package com.kakaopay.housingfund.fund.controller;
 import com.kakaopay.housingfund.fund.model.HousingFund;
 import com.kakaopay.housingfund.fund.model.Institute;
 import com.kakaopay.housingfund.fund.model.api.request.InstituteSaveRequest;
-import com.kakaopay.housingfund.fund.model.api.request.PredictRequest;
 import com.kakaopay.housingfund.fund.model.api.response.ApiResult;
 import com.kakaopay.housingfund.fund.model.api.response.institute.InstituteFundResponse;
 import com.kakaopay.housingfund.fund.model.api.response.institute.InstituteResponse;
@@ -11,10 +10,7 @@ import com.kakaopay.housingfund.fund.model.api.response.institute.MaxHousingFund
 import com.kakaopay.housingfund.fund.model.api.response.institute.PredictResponse;
 import com.kakaopay.housingfund.fund.service.FundService;
 import com.kakaopay.housingfund.util.predict.LinearRegressionModel;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -93,6 +89,7 @@ public class FundApiController {
     public ApiResult saveInstituteInfo(
             @AuthenticationPrincipal Authentication authentication,
             @RequestBody @ApiParam(name = "주택금융 추가 리스트", required = true) List<InstituteSaveRequest> saveRequest) {
+        logger.info("[saveInstituteInfo]" + Arrays.toString(saveRequest.toArray()));
         saveRequest.stream().forEach(
                 request -> {
                     logger.info("[saveInstituteInfo] " +request.toString());
@@ -103,13 +100,21 @@ public class FundApiController {
         return OK("HousingFunds are registered");
     }
 
+    @ApiOperation(value = "2018년의 은행 별 주택금융 투자금액 예측")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "bank", value = "예측 은행", required = true),
+            @ApiImplicitParam(name = "month", value = "예측 월", required = true)
+    })
     @GetMapping("predict")
-    public ApiResult predictFund(@RequestBody PredictRequest predictRequest) {
-        final Institute institute = fundService.findByInstituteNameFetchJoin(predictRequest.getBank()).get();
-        final List<Double> amountByMonth = getAmountByMonth(predictRequest, institute);
+    public ApiResult predictFund(
+            @RequestParam(value = "bank")  String bank,
+            @RequestParam(value = "month")  String month ) {
+        logger.info("[predictFund] bank=" + bank + ", month=" +month);
+        final Institute institute = fundService.findByInstituteNameFetchJoin(bank).get();
+        final List<Double> amountByMonth = getAmountByMonth(month, institute);
 
         int result = getPredictionResult(amountByMonth);
-        final PredictResponse predictResponse = new PredictResponse(institute.getInstituteCode(), 2018, Integer.parseInt(predictRequest.getMonth()), result);
+        final PredictResponse predictResponse = new PredictResponse(institute.getInstituteCode(), 2018, Integer.parseInt(month), result);
 
         return OK(predictResponse);
     }
@@ -130,10 +135,10 @@ public class FundApiController {
         return (int) (coefficients[0] + coefficients[1] * size);
     }
 
-    private List<Double> getAmountByMonth(@RequestBody PredictRequest predictRequest, Institute institute) {
+    private List<Double> getAmountByMonth(String month, Institute institute) {
         final List<Double> amountByMonth = new ArrayList<>();
         institute.getHousingFunds().forEach(housingFund -> {
-            if(housingFund.getMonth().equals(predictRequest.getMonth())) {
+            if(housingFund.getMonth().equals(month)) {
                 amountByMonth.add((double) housingFund.getAmount());
             }
         });

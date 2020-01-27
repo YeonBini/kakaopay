@@ -1,6 +1,7 @@
 package com.kakaopay.housingfund.user.model.api.request;
 
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class UserLoginRequest {
     @ApiModelProperty(name = "이메일", required = true)
@@ -21,4 +22,11 @@ public class UserLoginRequest {
         return password;
     }
 
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("email", email)
+                .append("password", password)
+                .toString();
+    }
 }
