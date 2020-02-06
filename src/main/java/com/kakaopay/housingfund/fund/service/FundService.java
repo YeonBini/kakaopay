@@ -7,12 +7,10 @@ import com.kakaopay.housingfund.fund.model.Institute;
 import com.kakaopay.housingfund.fund.model.Unit;
 import com.kakaopay.housingfund.fund.repository.HouseFundingRepository;
 import com.kakaopay.housingfund.fund.repository.InstituteRepository;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.IntStream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -92,7 +90,7 @@ public class FundService {
 
     public List<Institute> findAllFetchJoin() {
         List<Institute> all = instituteRepository.findAll();
-        all.stream().forEach(a -> Hibernate.initialize(a.getHousingFunds()));
+        all.stream().forEach(institute -> institute.getHousingFunds().iterator());
         return all;
     }
 
@@ -106,13 +104,13 @@ public class FundService {
 
     public Optional<Institute>  findByInstituteNameFetchJoin(String bankName) {
         final Optional<Institute> byInstituteName = instituteRepository.findByInstituteName(bankName);
-        Hibernate.initialize(byInstituteName.get().getHousingFunds());
+//        Hibernate.initialize(byInstituteName.get().getHousingFunds());
         return byInstituteName;
     }
 
     public List<Map<String, Integer>> findByInstituteMinMaxAvg(String instituteName) {
         final Optional<Institute> byInstituteName = instituteRepository.findByInstituteName(instituteName);
-        Hibernate.initialize(byInstituteName.get().getHousingFunds());
+//        Hibernate.initialize(byInstituteName.get().getHousingFunds());
 
         // 연도 기준을 avg값을 가져온다.
         final Map<String, Double> avgAmountMap = byInstituteName.get().avgAmountByYear();
