@@ -81,10 +81,6 @@ public class FundApiController {
     // 데이터 파일에서 각 레코드를 데이터베이스에 저장하는 API 개발
     // -> 입력 요청 리스트를 받아서 저장하는 로직 작성
     @ApiOperation(value = "주택금융 추가")
-    @ApiImplicitParam(
-            name = "api_key", value = "JWT 토큰", required = true, dataType = "string",
-            paramType = "header", defaultValue = "Bearer "
-    )
     @PostMapping("housing-fund/save")
     public ApiResult saveInstituteInfo(
             @AuthenticationPrincipal Authentication authentication,

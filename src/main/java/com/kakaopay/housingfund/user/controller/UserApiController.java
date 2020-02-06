@@ -7,10 +7,7 @@ import com.kakaopay.housingfund.user.model.api.request.UserJoinRequest;
 import com.kakaopay.housingfund.user.model.api.request.UserLoginRequest;
 import com.kakaopay.housingfund.user.model.api.response.UserSignInResponse;
 import com.kakaopay.housingfund.user.service.UserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -40,7 +37,10 @@ public class UserApiController {
 
     @ApiOperation(value = "회원가입")
     @PostMapping("signup")
-    public ApiResult join(@RequestBody @ApiParam(name = "회원 가입 양식", required = true) UserJoinRequest userJoinRequest) {
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userJoinRequest", value = "회원 가입 양식",paramType = "body", dataType = "UserJoinRequest", required = true)
+    })
+    public ApiResult join(@RequestBody UserJoinRequest userJoinRequest) {
         logger.info("[join]" + userJoinRequest.toString());
         Account account = new Account.Builder()
                 .email(userJoinRequest.getEmail())
@@ -54,8 +54,11 @@ public class UserApiController {
     }
 
     @ApiOperation(value = "로그인")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userLoginRequest", value = "로그인 양식",paramType = "body", dataType = "UserLoginRequest", required = true)
+    })
     @PostMapping("signin")
-    public ApiResult login(@RequestBody @ApiParam(name = "로그인 입력 양식", required = true) UserLoginRequest userLoginRequest) {
+    public ApiResult login(@RequestBody UserLoginRequest userLoginRequest) {
         logger.info("[login] " + userLoginRequest.toString());
         Account account = userService.login(userLoginRequest.getEmail(), userLoginRequest.getPassword());
         final String token = jwtTokenProvider.createToken(account.getEmail(), account.getRoles());
