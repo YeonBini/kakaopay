@@ -1,4 +1,4 @@
-package com.kakaopay.housingfund.exception;
+package com.kakaopay.housingfund.user.exception;
 
 public class EmailSignFailedException extends RuntimeException{
     public EmailSignFailedException() {

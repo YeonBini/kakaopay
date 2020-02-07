@@ -1,7 +1,7 @@
 package com.kakaopay.housingfund.user.service;
 
-import com.kakaopay.housingfund.exception.EmailSignFailedException;
-import com.kakaopay.housingfund.exception.UserNotFoundException;
+import com.kakaopay.housingfund.user.exception.EmailSignFailedException;
+import com.kakaopay.housingfund.user.exception.UserNotFoundException;
 import com.kakaopay.housingfund.user.model.Account;
 import com.kakaopay.housingfund.user.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetailsService;

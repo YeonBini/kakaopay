@@ -59,7 +59,7 @@ public class UserApiController {
     })
     @PostMapping("signin")
     public ApiResult login(@RequestBody UserLoginRequest userLoginRequest) {
-        logger.info("[login] " + userLoginRequest.toString());
+        logger.debug("[login] " + userLoginRequest.toString());
         Account account = userService.login(userLoginRequest.getEmail(), userLoginRequest.getPassword());
         final String token = jwtTokenProvider.createToken(account.getEmail(), account.getRoles());
         UserSignInResponse userSignInResponse = new UserSignInResponse(account.getEmail(), token);

@@ -1,6 +1,6 @@
 package com.kakaopay.housingfund.user.service;
 
-import com.kakaopay.housingfund.exception.EmailSignFailedException;
+import com.kakaopay.housingfund.user.exception.EmailSignFailedException;
 import com.kakaopay.housingfund.user.model.Account;
 import com.kakaopay.housingfund.user.model.Role;
 import com.kakaopay.housingfund.user.repository.UserRepository;
