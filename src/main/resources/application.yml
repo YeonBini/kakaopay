@@ -35,6 +35,7 @@ logging:
     org:
       hibernate:
         type: debug
+  config: "classpath:logback.xml"
 jwt:
   token:
     header: api_key
