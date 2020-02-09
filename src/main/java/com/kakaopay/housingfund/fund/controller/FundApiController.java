@@ -1,5 +1,6 @@
 package com.kakaopay.housingfund.fund.controller;
 
+import com.kakaopay.housingfund.exception.InstituteNotFoundException;
 import com.kakaopay.housingfund.fund.model.HousingFund;
 import com.kakaopay.housingfund.fund.model.Institute;
 import com.kakaopay.housingfund.fund.model.api.request.InstituteSaveRequest;
@@ -71,7 +72,8 @@ public class FundApiController {
         final List<Detail> detailsByYear = detailGroupByYear(institutesGroupByYear).get(year);
 
         checkNotNull(detailsByYear, "Year does not match");
-        final Detail maxInstitute = detailsByYear.stream().max(Comparator.comparingInt(Detail::getAmount)).get();
+        final Detail maxInstitute = detailsByYear.stream().max(Comparator.comparingInt(Detail::getAmount))
+                .orElseThrow(() -> new InstituteNotFoundException("Cannot find max institute"));
 
         final MaxHousingFundInstituteResonse max = new MaxHousingFundInstituteResonse(Integer.parseInt(maxInstitute.getYear()), maxInstitute.getInstituteName());
 
@@ -88,7 +90,7 @@ public class FundApiController {
         logger.info("[saveInstituteInfo]" + Arrays.toString(saveRequest.toArray()));
         saveRequest.stream().forEach(
                 request -> {
-                    logger.info("[saveInstituteInfo] " +request.toString());
+                    logger.info("[saveInstituteInfo] " + request.toString());
                     fundService.updateHousingFund(request.getBank(), request.getYear(), request.getMonth(), request.getAmount());
                 }
         );
@@ -103,10 +105,11 @@ public class FundApiController {
     })
     @GetMapping("predict")
     public ApiResult predictFund(
-            @RequestParam(value = "bank")  String bank,
-            @RequestParam(value = "month")  String month ) {
-        logger.info("[predictFund] bank=" + bank + ", month=" +month);
-        final Institute institute = fundService.findByInstituteNameFetchJoin(bank).get();
+            @RequestParam(value = "bank") String bank,
+            @RequestParam(value = "month") String month) {
+        logger.info("[predictFund] bank=" + bank + ", month=" + month);
+        final Institute institute = fundService.findByInstituteNameFetchJoin(bank)
+                .orElseThrow(() -> new InstituteNotFoundException("Cannot find " + bank));
         final List<Double> amountByMonth = getAmountByMonth(month, institute);
 
         int result = getPredictionResult(amountByMonth);
@@ -115,26 +118,32 @@ public class FundApiController {
         return OK(predictResponse);
     }
 
+    /**
+     * service layer로 옮겨야 하지 않을까?
+     *
+     * @param amountByMonth
+     * @return
+     */
     private int getPredictionResult(List<Double> amountByMonth) {
         int size = amountByMonth.size();
         double[] time = new double[size];
         double[] amount = new double[size];
-        for(int i=0; i<size; i++) {
-            time[i] = i+1;
+        for (int i = 0; i < size; i++) {
+            time[i] = i + 1.;
             amount[i] = amountByMonth.get(i);
         }
 
         LinearRegressionModel model = new LinearRegressionModel(time, amount);
         model.compute();
         double[] coefficients = model.getCoefficients();
-        logger.debug("[predictFund] slope : " +coefficients[1] + ", intercept : " +coefficients[0]);
+        logger.debug("[predictFund] slope : " + coefficients[1] + ", intercept : " + coefficients[0]);
         return (int) (coefficients[0] + coefficients[1] * size);
     }
 
     private List<Double> getAmountByMonth(String month, Institute institute) {
         final List<Double> amountByMonth = new ArrayList<>();
         institute.getHousingFunds().forEach(housingFund -> {
-            if(housingFund.getMonth().equals(month)) {
+            if (housingFund.getMonth().equals(month)) {
                 amountByMonth.add((double) housingFund.getAmount());
             }
         });
